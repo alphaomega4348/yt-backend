@@ -1,3 +1,4 @@
+
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import {User} from "../models/user.model.js"
@@ -5,19 +6,21 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
-const generateAccessandRefreshTokens= async(userID)=>{
-  try{
-      const user= await User.findById(userID)
-       const accessToken = user.generateAccessToken()
-       const refreshToken = user.generateRefreshToken()
+const generateAccessAndRefereshTokens = async(userId) =>{
+  try {
+      const user = await User.findById(userId)
+      const accessToken = user.generateAccessToken()
+      const refreshToken = user.generateRefreshToken()
 
-       user.refreshToken=refreshToken
-       await user.save({validateBeforeSave:false})
+      user.refreshToken = refreshToken
 
-       return {accessToken, refreshToken}
-  }
-  catch(err){
-    throw new ApiError(500,"Something went wrong while generating access and refresh tokens")
+      await user.save({ validateBeforeSave: false })
+
+      return {accessToken, refreshToken}
+
+
+  } catch (error) {
+      throw new ApiError(500, "Something went wrong while generating referesh and access token")
   }
 }
 
@@ -26,7 +29,7 @@ const registerUser = asyncHandler( async (req, res) => {
     /*
     1.> Get user details from frontend
     2.> Validate user details || rate limiter
-    3.> Check if user already exists : username and email
+    3.> Check if user already exists : userName and email
     4.> Check for images, Check for avatar
     5.> Upload them to Cloudinary, Check avatar
     6.> Create user object- entry in DB.
@@ -97,7 +100,7 @@ const loginUser = asyncHandler(async (req,res)=>{
     //Steps for login 
     /*
     1.>req.body
-    2.>username or email
+    2.>userName or email
     3.>search for user
     4.>check password
     5.>access and refresh token
@@ -106,13 +109,13 @@ const loginUser = asyncHandler(async (req,res)=>{
     */
 
     //Step-1
-    const {username,email,password}=req.body
-    if(!username && !email){
-      throw new ApiError(400,"Username or email required")
+    const {userName,email,password}=req.body
+    if(!userName && !email){
+      throw new ApiError(400,"userName or email required")
     }
     //Step-2
     const user=await User.findOne({
-      $or : [{username}, {password}]
+      $or : [{userName}, {password}]
     })
     //Step-3
     if(!user){
@@ -124,7 +127,7 @@ const loginUser = asyncHandler(async (req,res)=>{
       throw new ApiError(401,"Invalid user Credentials")
     }
     //Step-5
-   const{accessToken,refreshToken}= await generateAccessandRefreshTokens(user.user_id)
+   const{accessToken,refreshToken}= await generateAccessAndRefereshTokens(user._id)
     //Logical Step
     //Updating access and refresh token in user  
    const loggedInUser= await User.findById(user._id). 
@@ -152,7 +155,7 @@ const loginUser = asyncHandler(async (req,res)=>{
 
 
 })
-const logOutUser = asyncHandler(async (req,res)=>{
+const logoutUser = asyncHandler(async (req,res)=>{
     //Acess user to be logout using middlewares
     const userID= req.user._id
     await User.findByIdAndUpdate(userID,
@@ -183,5 +186,6 @@ const logOutUser = asyncHandler(async (req,res)=>{
 export {
     registerUser,
     loginUser,
-    logOutUser
+    logoutUser
 }
+
