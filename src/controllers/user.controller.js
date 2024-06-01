@@ -93,7 +93,7 @@ const registerUser = asyncHandler( async (req, res) => {
 
 
 })
-const loginUSer = asyncHandler(async (req,res)=>{
+const loginUser = asyncHandler(async (req,res)=>{
     //Steps for login 
     /*
     1.>req.body
@@ -152,7 +152,15 @@ const loginUSer = asyncHandler(async (req,res)=>{
 
 
 })
+const logOutUser = asyncHandler(async (req,res)=>{
+    //Acess user to be logout using middlewares
+
+
+
+})
 
 export {
     registerUser,
+    loginUser,
+    logOutUser
 }
