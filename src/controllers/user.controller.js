@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js"
 import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
 
 const generateAccessAndRefereshTokens = async(userId) =>{
   try {
@@ -161,8 +162,8 @@ const logoutUser = asyncHandler(async (req,res)=>{
     const userID= req.user._id
     await User.findByIdAndUpdate(userID,
       {
-      $set:{
-        refreshToken:undefined
+      $unset:{
+        refreshToken:1
       }
     },
       {
